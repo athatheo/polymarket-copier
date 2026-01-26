@@ -67,8 +67,8 @@ class CopyTradingBot:
                 logger.error(f"Config error: {error}")
             return False
         
-        # Log configuration (redacted)
-        logger.info(f"Target username: {config.TARGET_USERNAME}")
+        # Log configuration
+        logger.info(f"Target wallet: {config.TARGET_WALLET}")
         logger.info(f"Max slippage: {config.MAX_SLIPPAGE_PERCENT}%")
         logger.info(f"Max trade USD: ${config.MAX_TRADE_USD}")
         logger.info(f"Min trade USD: ${config.MIN_TRADE_USD}")
@@ -84,17 +84,9 @@ class CopyTradingBot:
         logger.info("Initializing data client...")
         self._data_client = DataClient()
         
-        # Resolve target username to wallet
-        logger.info(f"Resolving target username: {config.TARGET_USERNAME}")
-        profile = await self._data_client.search_profile(config.TARGET_USERNAME)
-        
-        if not profile:
-            logger.error(f"Could not find profile for username: {config.TARGET_USERNAME}")
-            return False
-        
-        self._target_wallet = profile.wallet_address
-        logger.info(f"Target wallet resolved: {self._target_wallet}")
-        logger.info(f"Target name: {profile.name or profile.username}")
+        # Use target wallet from config
+        self._target_wallet = config.TARGET_WALLET
+        logger.info(f"Target wallet: {self._target_wallet}")
         
         # Initialize CLOB client
         logger.info("Initializing CLOB client...")

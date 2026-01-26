@@ -12,7 +12,7 @@ load_dotenv()
 # =============================================================================
 # Target Account
 # =============================================================================
-TARGET_USERNAME: str = os.getenv("TARGET_USERNAME", "")
+TARGET_WALLET: str = os.getenv("TARGET_WALLET", "")  # Required: wallet address to copy
 
 # =============================================================================
 # Your Wallet
@@ -62,8 +62,10 @@ def validate_config() -> list[str]:
     """
     errors = []
     
-    if not TARGET_USERNAME:
-        errors.append("TARGET_USERNAME is required")
+    if not TARGET_WALLET:
+        errors.append("TARGET_WALLET is required")
+    elif not TARGET_WALLET.startswith("0x"):
+        errors.append("TARGET_WALLET must be a valid address starting with 0x")
     
     if not PRIVATE_KEY:
         errors.append("PRIVATE_KEY is required")

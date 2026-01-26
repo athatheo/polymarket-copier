@@ -31,7 +31,7 @@ async def test_config():
             logger.error(f"  Config error: {error}")
         return False
     
-    logger.info(f"  Target username: {config.TARGET_USERNAME}")
+    logger.info(f"  Target wallet: {config.TARGET_WALLET}")
     logger.info(f"  Max slippage: {config.MAX_SLIPPAGE_PERCENT}%")
     logger.info(f"  Max trade USD: ${config.MAX_TRADE_USD}")
     logger.info(f"  Min trade USD: ${config.MIN_TRADE_USD}")
@@ -50,21 +50,12 @@ async def test_data_client():
     client = DataClient()
     
     try:
-        # Test profile search
-        logger.info(f"  Searching for profile: {config.TARGET_USERNAME}")
-        profile = await client.search_profile(config.TARGET_USERNAME)
-        
-        if not profile:
-            logger.error(f"  Could not find profile for: {config.TARGET_USERNAME}")
-            return False
-        
-        logger.info(f"  Found wallet: {profile.wallet_address}")
-        logger.info(f"  Username: {profile.username}")
-        logger.info(f"  Name: {profile.name}")
+        # Test using target wallet directly
+        logger.info(f"  Using target wallet: {config.TARGET_WALLET}")
         
         # Test trades fetch
         logger.info("  Fetching recent trades...")
-        trades = await client.get_trades(profile.wallet_address, limit=5)
+        trades = await client.get_trades(config.TARGET_WALLET, limit=5)
         logger.info(f"  Found {len(trades)} recent trades")
         
         for trade in trades[:3]:

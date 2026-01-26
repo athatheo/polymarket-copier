@@ -22,6 +22,7 @@ class TradeStatus(Enum):
     SKIPPED_SLIPPAGE = "skipped_slippage"
     SKIPPED_SIZE = "skipped_size"
     SKIPPED_ERROR = "skipped_error"
+    SKIPPED_NO_POSITION = "skipped_no_position"  # Can't SELL without owning
     PENDING = "pending"
 
 

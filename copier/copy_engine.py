@@ -208,6 +208,37 @@ class CopyEngine:
         Returns:
             CopyDecision with all details
         """
+        # 0. For SELL trades, check if we have the position
+        if trade.side.upper() == "SELL":
+            try:
+                my_positions = await self._data.get_positions(my_wallet)
+                has_position = any(p.token_id == trade.token_id and p.size > 0 for p in my_positions)
+                
+                if not has_position:
+                    logger.info(f"Skipping SELL trade - we don't own this token: {trade.title}")
+                    return CopyDecision(
+                        should_copy=False,
+                        trade=trade,
+                        my_size_usd=0,
+                        my_size_shares=0,
+                        current_price=trade.price,
+                        slippage_percent=0,
+                        skip_reason="Cannot SELL - we don't own this position",
+                        skip_status=TradeStatus.SKIPPED_NO_POSITION,
+                    )
+            except Exception as e:
+                logger.warning(f"Failed to check positions for SELL: {e}")
+                return CopyDecision(
+                    should_copy=False,
+                    trade=trade,
+                    my_size_usd=0,
+                    my_size_shares=0,
+                    current_price=trade.price,
+                    slippage_percent=0,
+                    skip_reason=f"Failed to check positions: {e}",
+                    skip_status=TradeStatus.SKIPPED_ERROR,
+                )
+        
         # 1. Check slippage
         slippage_result = await self.check_slippage(
             target_price=trade.price,
