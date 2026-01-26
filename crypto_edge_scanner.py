@@ -198,26 +198,47 @@ def calculate_edge(
 # =============================================================================
 
 async def fetch_live_crypto_prices() -> dict[str, float]:
-    """Fetch current crypto prices from Binance API."""
-    symbols = {
-        "BTCUSDT": "BTC",
-        "ETHUSDT": "ETH",
-        "SOLUSDT": "SOL",
+    """Fetch current crypto prices from Kraken API (no geo-restrictions)."""
+    # Kraken pairs
+    pairs = {
+        "XXBTZUSD": "BTC",
+        "XETHZUSD": "ETH", 
+        "SOLUSD": "SOL",
     }
     
-    prices = {}
+    prices = {"BTC": 0, "ETH": 0, "SOL": 0}
     
     async with httpx.AsyncClient(timeout=10) as client:
-        for symbol, crypto in symbols.items():
+        try:
+            # Kraken allows fetching multiple pairs in one request
+            pair_list = ",".join(pairs.keys())
+            url = f"https://api.kraken.com/0/public/Ticker?pair={pair_list}"
+            response = await client.get(url)
+            response.raise_for_status()
+            data = response.json()
+            
+            if data.get("error"):
+                print(f"  Warning: Kraken API error: {data['error']}")
+            
+            result = data.get("result", {})
+            for kraken_pair, crypto in pairs.items():
+                if kraken_pair in result:
+                    # 'c' is the last trade closed [price, lot volume]
+                    prices[crypto] = float(result[kraken_pair]["c"][0])
+                    
+        except Exception as e:
+            print(f"  Warning: Failed to fetch prices from Kraken: {e}")
+            # Fallback to CryptoCompare
             try:
-                url = f"https://api.binance.com/api/v3/ticker/price?symbol={symbol}"
+                url = "https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH,SOL&tsyms=USD"
                 response = await client.get(url)
                 response.raise_for_status()
                 data = response.json()
-                prices[crypto] = float(data.get("price", 0))
-            except Exception as e:
-                print(f"  Warning: Failed to fetch {crypto} price: {e}")
-                prices[crypto] = 0
+                prices["BTC"] = float(data.get("BTC", {}).get("USD", 0))
+                prices["ETH"] = float(data.get("ETH", {}).get("USD", 0))
+                prices["SOL"] = float(data.get("SOL", {}).get("USD", 0))
+            except Exception as e2:
+                print(f"  Warning: Fallback also failed: {e2}")
     
     return prices
 

@@ -162,66 +162,76 @@ async def fetch_historical_crypto_prices(
     end_date: datetime
 ) -> list[PricePoint]:
     """
-    Fetch historical hourly prices from Binance API.
+    Fetch historical hourly prices from Kraken API (no geo-restrictions).
     
-    Uses klines (candlestick) endpoint for hourly data.
+    Uses OHLC endpoint for hourly data.
     """
-    symbols = {
-        "BTC": "BTCUSDT",
-        "ETH": "ETHUSDT",
-        "SOL": "SOLUSDT",
+    pairs = {
+        "BTC": "XXBTZUSD",
+        "ETH": "XETHZUSD",
+        "SOL": "SOLUSD",
     }
     
-    symbol = symbols.get(crypto)
-    if not symbol:
+    pair = pairs.get(crypto)
+    if not pair:
         return []
     
-    # Binance klines endpoint
-    url = "https://api.binance.com/api/v3/klines"
+    # Kraken OHLC endpoint
+    url = "https://api.kraken.com/0/public/OHLC"
     
-    # Convert to Unix timestamps (milliseconds)
-    start_ts = int(start_date.timestamp() * 1000)
-    end_ts = int(end_date.timestamp() * 1000)
+    # Convert to Unix timestamp
+    start_ts = int(start_date.timestamp())
     
     all_prices = []
-    current_start = start_ts
     
     async with httpx.AsyncClient(timeout=30) as client:
-        while current_start < end_ts:
+        try:
+            params = {
+                "pair": pair,
+                "interval": 60,  # 60 minutes = hourly
+                "since": start_ts,
+            }
+            
+            response = await client.get(url, params=params)
+            response.raise_for_status()
+            data = response.json()
+            
+            if data.get("error"):
+                print(f"Warning: Kraken API error: {data['error']}")
+                return []
+            
+            result = data.get("result", {})
+            # Find the pair data (Kraken sometimes uses different key names)
+            pair_data = None
+            for key in result:
+                if key != "last":
+                    pair_data = result[key]
+                    break
+            
+            if pair_data:
+                for candle in pair_data:
+                    # Candle format: [time, open, high, low, close, vwap, volume, count]
+                    ts = datetime.fromtimestamp(candle[0], tz=timezone.utc)
+                    if ts <= end_date:
+                        close_price = float(candle[4])
+                        all_prices.append(PricePoint(timestamp=ts, price=close_price))
+                        
+        except Exception as e:
+            print(f"Error fetching {crypto} prices from Kraken: {e}")
+            # Fallback to CryptoCompare historical
             try:
-                params = {
-                    "symbol": symbol,
-                    "interval": "1h",  # Hourly candles
-                    "startTime": current_start,
-                    "endTime": end_ts,
-                    "limit": 1000,  # Max per request
-                }
-                
-                response = await client.get(url, params=params)
+                hours = int((end_date - start_date).total_seconds() / 3600)
+                url = f"https://min-api.cryptocompare.com/data/v2/histohour?fsym={crypto}&tsym=USD&limit={min(hours, 2000)}"
+                response = await client.get(url)
                 response.raise_for_status()
                 data = response.json()
                 
-                if not data:
-                    break
-                
-                for candle in data:
-                    # Candle format: [open_time, open, high, low, close, volume, ...]
-                    ts = datetime.fromtimestamp(candle[0] / 1000, tz=timezone.utc)
-                    close_price = float(candle[4])  # Use close price
-                    all_prices.append(PricePoint(timestamp=ts, price=close_price))
-                
-                # Move to next batch
-                last_ts = data[-1][0]
-                if last_ts <= current_start:
-                    break
-                current_start = last_ts + 1
-                
-                # Small delay to avoid rate limiting
-                await asyncio.sleep(0.1)
-                
-            except Exception as e:
-                print(f"Error fetching {crypto} prices: {e}")
-                break
+                for item in data.get("Data", {}).get("Data", []):
+                    ts = datetime.fromtimestamp(item["time"], tz=timezone.utc)
+                    if start_date <= ts <= end_date:
+                        all_prices.append(PricePoint(timestamp=ts, price=float(item["close"])))
+            except Exception as e2:
+                print(f"Fallback also failed: {e2}")
     
     return all_prices
 
