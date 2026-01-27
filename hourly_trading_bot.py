@@ -41,13 +41,15 @@ MIN_MINUTES_TO_TRADE = int(getattr(config, 'HOURLY_MIN_MINUTES_TO_TRADE', 5))
 
 # API URLs
 BINANCE_API_URL = "https://api.binance.com/api/v3"
+BINANCE_US_API_URL = "https://api.binance.us/api/v3"
+COINGECKO_API_URL = "https://api.coingecko.com/api/v3"
 GAMMA_API_URL = "https://gamma-api.polymarket.com"
 
 # Asset mapping
 ASSETS = {
-    "BTC": {"binance": "BTCUSDT", "polymarket": "bitcoin"},
-    "ETH": {"binance": "ETHUSDT", "polymarket": "ethereum"},
-    "SOL": {"binance": "SOLUSDT", "polymarket": "solana"},
+    "BTC": {"binance": "BTCUSDT", "polymarket": "bitcoin", "coingecko": "bitcoin"},
+    "ETH": {"binance": "ETHUSDT", "polymarket": "ethereum", "coingecko": "ethereum"},
+    "SOL": {"binance": "SOLUSDT", "polymarket": "solana", "coingecko": "solana"},
 }
 
 
@@ -130,69 +132,143 @@ class HourlySession:
 
 
 # =============================================================================
-# BinanceFetcher - Real-time price data from Binance
+# PriceFetcher - Real-time price data with multiple source fallback
 # =============================================================================
 
-class BinanceFetcher:
-    """Fetches real-time price data from Binance."""
+class PriceFetcher:
+    """
+    Fetches real-time price data with fallback sources.
+    
+    Tries in order:
+    1. Binance.com (global)
+    2. Binance.us (US-accessible)
+    3. CoinGecko (universal fallback)
+    """
     
     def __init__(self, http: httpx.AsyncClient):
         self.http = http
         self._hourly_opens: dict[str, float] = {}
         self._last_hour_fetched: dict[str, int] = {}
+        self._working_source: Optional[str] = None  # Cache which source works
     
-    async def get_current_price(self, symbol: str) -> float:
-        """Get current price for a symbol (e.g., BTCUSDT)."""
-        url = f"{BINANCE_API_URL}/ticker/price"
-        params = {"symbol": symbol}
-        
-        response = await self.http.get(url, params=params)
-        response.raise_for_status()
-        data = response.json()
-        
-        return float(data["price"])
+    async def _try_binance_price(self, symbol: str, base_url: str) -> Optional[float]:
+        """Try to get price from a Binance API."""
+        try:
+            url = f"{base_url}/ticker/price"
+            params = {"symbol": symbol}
+            response = await self.http.get(url, params=params, timeout=5.0)
+            if response.status_code == 200:
+                data = response.json()
+                return float(data["price"])
+        except Exception:
+            pass
+        return None
     
-    async def get_hourly_open(self, symbol: str) -> float:
-        """Get the open price for the current hourly candle."""
+    async def _try_binance_kline(self, symbol: str, base_url: str) -> Optional[float]:
+        """Try to get hourly open from a Binance API."""
+        try:
+            url = f"{base_url}/klines"
+            params = {"symbol": symbol, "interval": "1h", "limit": 1}
+            response = await self.http.get(url, params=params, timeout=5.0)
+            if response.status_code == 200:
+                data = response.json()
+                if data:
+                    return float(data[0][1])  # Open price
+        except Exception:
+            pass
+        return None
+    
+    async def _try_coingecko_price(self, coin_id: str) -> Optional[float]:
+        """Try to get price from CoinGecko."""
+        try:
+            url = f"{COINGECKO_API_URL}/simple/price"
+            params = {"ids": coin_id, "vs_currencies": "usd"}
+            response = await self.http.get(url, params=params, timeout=5.0)
+            if response.status_code == 200:
+                data = response.json()
+                if coin_id in data and "usd" in data[coin_id]:
+                    return float(data[coin_id]["usd"])
+        except Exception:
+            pass
+        return None
+    
+    async def get_current_price(self, symbol: str, coingecko_id: str = None) -> float:
+        """
+        Get current price with fallback sources.
+        
+        Args:
+            symbol: Binance symbol (e.g., BTCUSDT)
+            coingecko_id: CoinGecko coin ID (e.g., bitcoin)
+        """
+        # Try Binance.com first
+        price = await self._try_binance_price(symbol, BINANCE_API_URL)
+        if price is not None:
+            self._working_source = "binance.com"
+            return price
+        
+        # Try Binance.us
+        price = await self._try_binance_price(symbol, BINANCE_US_API_URL)
+        if price is not None:
+            self._working_source = "binance.us"
+            return price
+        
+        # Fall back to CoinGecko
+        if coingecko_id:
+            price = await self._try_coingecko_price(coingecko_id)
+            if price is not None:
+                self._working_source = "coingecko"
+                return price
+        
+        raise ValueError(f"Could not fetch price for {symbol} from any source")
+    
+    async def get_hourly_open(self, symbol: str, coingecko_id: str = None) -> float:
+        """
+        Get the open price for the current hourly candle.
+        
+        Note: CoinGecko doesn't provide hourly candles easily, so we use
+        the price at the start of the hour (cached) as approximation.
+        """
         current_hour = datetime.now(timezone.utc).hour
         
-        # Cache the hourly open to avoid repeated API calls
-        if (symbol in self._last_hour_fetched and 
-            self._last_hour_fetched[symbol] == current_hour and
-            symbol in self._hourly_opens):
-            return self._hourly_opens[symbol]
+        # Check cache
+        cache_key = f"{symbol}_{current_hour}"
+        if cache_key in self._hourly_opens:
+            return self._hourly_opens[cache_key]
         
-        url = f"{BINANCE_API_URL}/klines"
-        params = {
-            "symbol": symbol,
-            "interval": "1h",
-            "limit": 1,
-        }
-        
-        response = await self.http.get(url, params=params)
-        response.raise_for_status()
-        data = response.json()
-        
-        if data:
-            # Kline format: [open_time, open, high, low, close, volume, ...]
-            open_price = float(data[0][1])
-            self._hourly_opens[symbol] = open_price
-            self._last_hour_fetched[symbol] = current_hour
+        # Try Binance.com
+        open_price = await self._try_binance_kline(symbol, BINANCE_API_URL)
+        if open_price is not None:
+            self._hourly_opens[cache_key] = open_price
             return open_price
         
-        raise ValueError(f"No kline data for {symbol}")
+        # Try Binance.us
+        open_price = await self._try_binance_kline(symbol, BINANCE_US_API_URL)
+        if open_price is not None:
+            self._hourly_opens[cache_key] = open_price
+            return open_price
+        
+        # CoinGecko fallback: use current price as "open" if we don't have it cached
+        # This is less accurate but better than failing
+        if coingecko_id:
+            logger.warning(f"Using CoinGecko current price as hourly open for {symbol} (less accurate)")
+            price = await self._try_coingecko_price(coingecko_id)
+            if price is not None:
+                self._hourly_opens[cache_key] = price
+                return price
+        
+        raise ValueError(f"Could not fetch hourly open for {symbol} from any source")
     
-    async def get_price_change_pct(self, symbol: str) -> float:
+    async def get_price_change_pct(self, symbol: str, coingecko_id: str = None) -> float:
         """Get percentage change from hourly open."""
-        open_price = await self.get_hourly_open(symbol)
-        current_price = await self.get_current_price(symbol)
+        open_price = await self.get_hourly_open(symbol, coingecko_id)
+        current_price = await self.get_current_price(symbol, coingecko_id)
         
         return ((current_price - open_price) / open_price) * 100
     
-    async def get_price_data(self, symbol: str) -> dict:
+    async def get_price_data(self, symbol: str, coingecko_id: str = None) -> dict:
         """Get all price data for a symbol."""
-        open_price = await self.get_hourly_open(symbol)
-        current_price = await self.get_current_price(symbol)
+        open_price = await self.get_hourly_open(symbol, coingecko_id)
+        current_price = await self.get_current_price(symbol, coingecko_id)
         pct_change = ((current_price - open_price) / open_price) * 100
         
         return {
@@ -200,6 +276,7 @@ class BinanceFetcher:
             "open": open_price,
             "current": current_price,
             "pct_change": pct_change,
+            "source": self._working_source,
         }
 
 
@@ -641,7 +718,7 @@ class HourlyTradingBot:
         self.dry_run = dry_run
         self.http: Optional[httpx.AsyncClient] = None
         self.clob_client: Optional[ClobClient] = None
-        self.binance: Optional[BinanceFetcher] = None
+        self.price_fetcher: Optional[PriceFetcher] = None
         self.polymarket: Optional[PolymarketFetcher] = None
         self.position_manager = PositionManager()
         self.state_machine = TradingStateMachine()
@@ -652,7 +729,7 @@ class HourlyTradingBot:
     async def initialize(self):
         """Initialize all clients."""
         self.http = httpx.AsyncClient(timeout=30.0)
-        self.binance = BinanceFetcher(self.http)
+        self.price_fetcher = PriceFetcher(self.http)
         self.polymarket = PolymarketFetcher(self.http)
         
         if not self.dry_run:
@@ -713,6 +790,9 @@ class HourlyTradingBot:
         
         pnl = None
         
+        # Get the token ID for the side we're trading
+        token_id = market_data["down_token_id"] if side == "DOWN" else market_data["up_token_id"]
+        
         # Execute the trade
         if action in (Action.BUY_DOWN, Action.BUY_UP):
             # Check exposure limits
@@ -721,24 +801,55 @@ class HourlyTradingBot:
                 logger.warning(f"Would exceed max exposure, skipping {action.value}")
                 return None
             
+            # Calculate shares to buy
+            shares = POSITION_SIZE_USD / price
+            
             if self.dry_run:
-                logger.info(f"[DRY RUN] Would BUY {side} for {asset} @ ${price:.4f}")
+                logger.info(f"[DRY RUN] Would BUY {side} for {asset} @ ${price:.4f} ({shares:.2f} shares)")
             else:
-                # TODO: Execute actual order via CLOB
-                pass
+                # Execute actual order via CLOB
+                result = await self.clob_client.place_order(
+                    token_id=token_id,
+                    side="BUY",
+                    price=price,
+                    size=shares,
+                )
+                if not result.success:
+                    logger.error(f"Failed to place BUY order for {asset} {side}: {result.error}")
+                    return None
+                logger.info(f"BUY order placed for {asset} {side}: {result.order_id}")
             
             self.position_manager.open_position(asset, side, price, POSITION_SIZE_USD)
             self.trade_logger.log_trade(asset, action, price, POSITION_SIZE_USD)
             
         else:  # SELL
+            # Get the position to know how many shares to sell
+            market_pos = self.position_manager.get_position(asset)
+            position = market_pos.up_position if side == "UP" else market_pos.down_position
+            
+            if position is None:
+                logger.warning(f"No {side} position to sell for {asset}")
+                return None
+            
+            shares = position.size
+            
             if self.dry_run:
-                logger.info(f"[DRY RUN] Would SELL {side} for {asset} @ ${price:.4f}")
+                logger.info(f"[DRY RUN] Would SELL {side} for {asset} @ ${price:.4f} ({shares:.2f} shares)")
             else:
-                # TODO: Execute actual order via CLOB
-                pass
+                # Execute actual order via CLOB
+                result = await self.clob_client.place_order(
+                    token_id=token_id,
+                    side="SELL",
+                    price=price,
+                    size=shares,
+                )
+                if not result.success:
+                    logger.error(f"Failed to place SELL order for {asset} {side}: {result.error}")
+                    return None
+                logger.info(f"SELL order placed for {asset} {side}: {result.order_id}")
             
             pnl = self.position_manager.close_position(asset, side, price)
-            self.trade_logger.log_trade(asset, action, price, 0, pnl)
+            self.trade_logger.log_trade(asset, action, price, shares, pnl)
         
         return pnl
     
@@ -750,13 +861,16 @@ class HourlyTradingBot:
         """
         binance_symbol = ASSETS[asset]["binance"]
         polymarket_name = ASSETS[asset]["polymarket"]
+        coingecko_id = ASSETS[asset]["coingecko"]
         
-        # Fetch Binance price data
+        # Fetch price data (with fallback sources)
         try:
-            price_data = await self.binance.get_price_data(binance_symbol)
+            price_data = await self.price_fetcher.get_price_data(binance_symbol, coingecko_id)
             binance_pct = price_data["pct_change"]
+            if price_data.get("source") and price_data["source"] != "binance.com":
+                logger.info(f"Using {price_data['source']} for {asset} price data")
         except Exception as e:
-            logger.error(f"Error fetching Binance data for {asset}: {e}")
+            logger.error(f"Error fetching price data for {asset}: {e}")
             return None
         
         # Fetch Polymarket market data
