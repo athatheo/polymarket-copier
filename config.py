@@ -31,6 +31,8 @@ CHAIN_ID: int = 137  # Polygon mainnet
 # Polling & Timing
 # =============================================================================
 POLL_INTERVAL_SECONDS: int = int(os.getenv("POLL_INTERVAL_SECONDS", "10"))
+# On fresh start (empty database), look back this many hours for recent trades
+LOOKBACK_HOURS: int = int(os.getenv("LOOKBACK_HOURS", "24"))
 
 # =============================================================================
 # Safety Limits

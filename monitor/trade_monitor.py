@@ -63,9 +63,13 @@ class TradeMonitor:
                 f"{datetime.fromtimestamp(self._last_check_timestamp)}"
             )
         else:
-            # Start from now to avoid processing historical trades
-            self._last_check_timestamp = int(datetime.utcnow().timestamp())
-            logger.info("Starting fresh - will only process new trades from now")
+            # On fresh start, look back LOOKBACK_HOURS to catch recent trades
+            lookback_seconds = config.LOOKBACK_HOURS * 3600
+            self._last_check_timestamp = int(datetime.utcnow().timestamp()) - lookback_seconds
+            logger.info(
+                f"Starting fresh - looking back {config.LOOKBACK_HOURS} hours for recent trades "
+                f"(from {datetime.fromtimestamp(self._last_check_timestamp)})"
+            )
         
         logger.info(
             f"Starting trade monitor for wallet {self._target_wallet}, "
@@ -183,8 +187,13 @@ class TradeMonitorWithBackoff(TradeMonitor):
                 f"{datetime.fromtimestamp(self._last_check_timestamp)}"
             )
         else:
-            self._last_check_timestamp = int(datetime.utcnow().timestamp())
-            logger.info("Starting fresh - will only process new trades from now")
+            # On fresh start, look back LOOKBACK_HOURS to catch recent trades
+            lookback_seconds = config.LOOKBACK_HOURS * 3600
+            self._last_check_timestamp = int(datetime.utcnow().timestamp()) - lookback_seconds
+            logger.info(
+                f"Starting fresh - looking back {config.LOOKBACK_HOURS} hours for recent trades "
+                f"(from {datetime.fromtimestamp(self._last_check_timestamp)})"
+            )
         
         logger.info(
             f"Starting trade monitor (with backoff) for wallet {self._target_wallet}"

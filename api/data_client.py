@@ -134,6 +134,9 @@ class DataClient:
         """
         Get recent trades for a wallet address.
         
+        Uses the /activity endpoint which returns complete trade data,
+        unlike /trades which can miss recent transactions.
+        
         Args:
             wallet: The wallet address (proxy wallet)
             since_timestamp: Only return trades after this timestamp
@@ -142,7 +145,8 @@ class DataClient:
         Returns:
             List of Trade objects, newest first
         """
-        url = f"{config.DATA_API_URL}/trades"
+        # Use /activity endpoint - /trades endpoint misses recent trades
+        url = f"{config.DATA_API_URL}/activity"
         params = {
             "user": wallet,
             "limit": limit,
@@ -155,6 +159,10 @@ class DataClient:
             
             trades = []
             for item in data:
+                # Filter for TRADE type only (activity includes other types)
+                if item.get("type") != "TRADE":
+                    continue
+                
                 timestamp = item.get("timestamp", 0)
                 
                 # Filter by timestamp if specified
