@@ -56,6 +56,26 @@ DATABASE_PATH: str = os.getenv("DATABASE_PATH", "copied_trades.db")
 # =============================================================================
 LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
 
+# =============================================================================
+# Hourly Trading Bot Configuration
+# =============================================================================
+# Position sizing
+HOURLY_POSITION_SIZE_USD: float = float(os.getenv("HOURLY_POSITION_SIZE_USD", "100"))
+HOURLY_MAX_EXPOSURE_PER_MARKET: float = float(os.getenv("HOURLY_MAX_EXPOSURE_PER_MARKET", "200"))
+HOURLY_MAX_TOTAL_EXPOSURE: float = float(os.getenv("HOURLY_MAX_TOTAL_EXPOSURE", "500"))
+
+# Trading thresholds
+HOURLY_PROFIT_TAKE_PCT: float = float(os.getenv("HOURLY_PROFIT_TAKE_PCT", "15"))
+HOURLY_HEDGE_TRIGGER_PCT: float = float(os.getenv("HOURLY_HEDGE_TRIGGER_PCT", "-10"))
+
+# Timing
+HOURLY_RE_ENTRY_COOLDOWN_SEC: int = int(os.getenv("HOURLY_RE_ENTRY_COOLDOWN_SEC", "30"))
+HOURLY_POLL_INTERVAL_SEC: int = int(os.getenv("HOURLY_POLL_INTERVAL_SEC", "15"))
+
+# Entry filters
+HOURLY_MAX_SPREAD_TO_ENTER: float = float(os.getenv("HOURLY_MAX_SPREAD_TO_ENTER", "0.03"))
+HOURLY_MIN_MINUTES_TO_TRADE: int = int(os.getenv("HOURLY_MIN_MINUTES_TO_TRADE", "5"))
+
 
 def validate_config() -> list[str]:
     """

@@ -57,6 +57,7 @@ HOURLY_VOLATILITY = {
 
 GAMMA_API_URL = "https://gamma-api.polymarket.com"
 POSITIONS_FILE = "edge_positions.json"
+REFERENCE_PRICES_FILE = "reference_prices.json"  # Track actual reference prices
 
 
 # =============================================================================
@@ -501,68 +502,72 @@ def should_take_profit(
 
 
 # =============================================================================
-# REFERENCE PRICE ESTIMATION
+# REFERENCE PRICE TRACKING (Fixed - no circular logic)
 # =============================================================================
 
-def estimate_reference_price(
-    market: CryptoMarket,
-    current_price: float,
-    current_up_prob: float
-) -> float:
-    """
-    Estimate the reference price (market open price) from current market state.
+def load_reference_prices() -> dict:
+    """Load tracked reference prices from file."""
+    if not Path(REFERENCE_PRICES_FILE).exists():
+        return {}
     
-    If market is at 50/50, reference price ≈ current price.
-    If market is at 60/40 UP, price has moved up from reference.
-    
-    This is an approximation - ideally we'd get this from Polymarket directly.
-    """
-    # Time remaining
+    try:
+        with open(REFERENCE_PRICES_FILE, "r") as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"Warning: Could not load reference prices: {e}")
+        return {}
+
+
+def save_reference_prices(prices: dict):
+    """Save reference prices to file."""
+    # Clean up expired markets (older than 2 hours)
     now = datetime.now(timezone.utc)
-    minutes_remaining = max(0, (market.end_time - now).total_seconds() / 60)
+    cleaned = {}
+    for market_id, data in prices.items():
+        try:
+            end_time = datetime.fromisoformat(data["end_time"].replace("Z", "+00:00"))
+            if end_time > now - timedelta(hours=2):
+                cleaned[market_id] = data
+        except:
+            pass
     
-    if minutes_remaining <= 0:
-        return current_price
+    with open(REFERENCE_PRICES_FILE, "w") as f:
+        json.dump(cleaned, f, indent=2)
+
+
+def get_or_set_reference_price(
+    market: CryptoMarket,
+    current_crypto_price: float,
+    reference_prices: dict,
+) -> tuple[float, bool]:
+    """
+    Get the reference price for a market, or set it if this is the first time we see it.
     
-    # If market is 50/50, current price IS the reference
-    if abs(current_up_prob - 0.5) < 0.02:
-        return current_price
+    Returns:
+        (reference_price, is_new_market)
+    """
+    market_id = market.market_id
     
-    # Estimate how much price has moved based on market probability
-    hourly_vol = HOURLY_VOLATILITY.get(market.crypto, 0.5)
-    remaining_vol = hourly_vol * math.sqrt(minutes_remaining / 60)
+    # Check if we already have a reference price for this market
+    if market_id in reference_prices:
+        stored = reference_prices[market_id]
+        return stored["reference_price"], False
     
-    if remaining_vol <= 0.001:
-        return current_price
+    # New market! Record current crypto price as the reference
+    # This is the key fix: we capture the ACTUAL price when we first see the market
+    reference_prices[market_id] = {
+        "reference_price": current_crypto_price,
+        "crypto": market.crypto,
+        "title": market.title,
+        "end_time": market.end_time.isoformat(),
+        "recorded_at": datetime.now(timezone.utc).isoformat(),
+        "market_up_price_at_record": market.up_price,
+    }
     
-    # Inverse normal CDF approximation
-    # If P(up) = 0.7, then z ≈ 0.52, meaning price is 0.52 * vol above reference
-    from math import log, sqrt
+    print(f"  📌 NEW MARKET: {market.title}")
+    print(f"     Reference {market.crypto} price: ${current_crypto_price:,.2f}")
     
-    # Simple approximation of inverse normal CDF
-    p = current_up_prob
-    if p <= 0.01:
-        z_score = -2.33
-    elif p >= 0.99:
-        z_score = 2.33
-    else:
-        # Rational approximation
-        if p < 0.5:
-            t = sqrt(-2 * log(p))
-            z_score = -(t - (2.515517 + 0.802853*t + 0.010328*t*t) / 
-                        (1 + 1.432788*t + 0.189269*t*t + 0.001308*t*t*t))
-        else:
-            t = sqrt(-2 * log(1 - p))
-            z_score = t - (2.515517 + 0.802853*t + 0.010328*t*t) / \
-                      (1 + 1.432788*t + 0.189269*t*t + 0.001308*t*t*t)
-    
-    # Price change from reference = z_score * remaining_vol
-    price_change_pct = z_score * remaining_vol
-    
-    # Reference = current / (1 + change%)
-    reference = current_price / (1 + price_change_pct / 100)
-    
-    return reference
+    return current_crypto_price, True
 
 
 # =============================================================================
@@ -572,9 +577,10 @@ def estimate_reference_price(
 async def scan_for_opportunities(
     markets: list[CryptoMarket],
     crypto_prices: dict[str, float],
-    positions: list[Position]
+    positions: list[Position],
+    reference_prices: dict,  # Pass in tracked reference prices
 ) -> list[EdgeOpportunity]:
-    """Scan markets for edge opportunities."""
+    """Scan markets for edge opportunities using ACTUAL tracked reference prices."""
     opportunities = []
     now = datetime.now(timezone.utc)
     
@@ -595,12 +601,17 @@ async def scan_for_opportunities(
         if current_price <= 0:
             continue
         
-        # Estimate reference price
-        reference_price = estimate_reference_price(
-            market, current_price, market.up_price
+        # Get ACTUAL reference price (tracked from when we first saw this market)
+        reference_price, is_new = get_or_set_reference_price(
+            market, current_price, reference_prices
         )
         
-        # Calculate fair probability
+        # Skip new markets on first scan - wait for price to potentially diverge
+        # This ensures we have a real reference point before calculating edge
+        if is_new:
+            continue
+        
+        # Calculate fair probability using the REAL reference price
         hourly_vol = HOURLY_VOLATILITY.get(market.crypto, 0.5)
         fair_up_prob = estimate_fair_probability(
             reference_price, current_price, minutes_remaining, hourly_vol
@@ -608,6 +619,13 @@ async def scan_for_opportunities(
         
         # Calculate edge
         edge = calculate_edge(market.up_price, fair_up_prob)
+        
+        # Log edge calculations for visibility
+        if edge["edge_magnitude"] >= 0.03:  # Log anything with 3%+ edge
+            price_change_pct = (current_price - reference_price) / reference_price * 100
+            print(f"  {market.crypto} {market.title[-15:]}: "
+                  f"ref=${reference_price:,.0f} now=${current_price:,.0f} ({price_change_pct:+.2f}%) "
+                  f"| fair={fair_up_prob:.1%} mkt={market.up_price:.1%} edge={edge['edge_magnitude']:.1%}")
         
         # Check if edge exceeds threshold
         if edge["edge_magnitude"] >= ENTRY_EDGE_THRESHOLD:
@@ -817,9 +835,10 @@ def display_status(
 async def run_scanner(dry_run: bool = True, interval_seconds: int = 60):
     """Main scanner loop."""
     print("=" * 80)
-    print("  CRYPTO EDGE SCANNER")
+    print("  CRYPTO EDGE SCANNER (with real reference price tracking)")
     print(f"  Mode: {'DRY RUN' if dry_run else 'LIVE TRADING'}")
     print(f"  Interval: {interval_seconds}s")
+    print(f"  Edge threshold: {ENTRY_EDGE_THRESHOLD*100}%")
     print("=" * 80)
     
     # Initialize CLOB client
@@ -831,6 +850,10 @@ async def run_scanner(dry_run: bool = True, interval_seconds: int = 60):
     
     positions = load_positions()
     print(f"✓ Loaded {len(positions)} existing positions")
+    
+    # Load tracked reference prices
+    reference_prices = load_reference_prices()
+    print(f"✓ Loaded {len(reference_prices)} tracked reference prices")
     
     try:
         while True:
@@ -844,10 +867,13 @@ async def run_scanner(dry_run: bool = True, interval_seconds: int = 60):
                 print("  Searching for active markets...")
                 markets = await get_active_hourly_markets()
                 
-                # Scan for opportunities
+                # Scan for opportunities (using tracked reference prices)
                 opportunities = await scan_for_opportunities(
-                    markets, crypto_prices, positions
+                    markets, crypto_prices, positions, reference_prices
                 )
+                
+                # Save reference prices after each scan
+                save_reference_prices(reference_prices)
                 
                 # Display status
                 display_status(markets, opportunities, positions, crypto_prices)

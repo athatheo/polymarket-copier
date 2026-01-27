@@ -1,0 +1,395 @@
+{
+  "timestamp": "2026-01-27T13:39:02.946127+00:00",
+  "markets": [
+    {
+      "slug": "bitcoin-up-or-down-january-27-7am-et",
+      "asset": "BTC",
+      "question": "Bitcoin Up or Down - January 27, 7AM ET",
+      "condition_id": "0x94c363f9615a3e4749f9f03d341818d3aec1e4de06afc2f1604dfaaaf379a17e",
+      "end_time": "2026-01-27T13:00:00+00:00",
+      "event_start_time": "2026-01-27T12:00:00+00:00",
+      "volume": 343839.167653,
+      "liquidity": 686474.8972,
+      "best_bid": null,
+      "best_ask": 0.001,
+      "spread": 0.001,
+      "last_trade_price": 0.001,
+      "outcomes": [
+        {
+          "name": "Up",
+          "token_id": "27234397939345308941000325547964829399435493642247593787449716596522324829368",
+          "price": 0.0005
+        },
+        {
+          "name": "Down",
+          "token_id": "4877311193242691331890320309833058828137736289241918181235928100659841691773",
+          "price": 0.9995
+        }
+      ]
+    },
+    {
+      "slug": "ethereum-up-or-down-january-27-7am-et",
+      "asset": "ETH",
+      "question": "Ethereum Up or Down - January 27, 7AM ET",
+      "condition_id": "0x127abc09fc59f6d12a8957dc46505585a3b4009395473ee165fac954b04114f3",
+      "end_time": "2026-01-27T13:00:00+00:00",
+      "event_start_time": "2026-01-27T12:00:00+00:00",
+      "volume": 103057.651951,
+      "liquidity": 859639.68602,
+      "best_bid": 0.999,
+      "best_ask": 1.0,
+      "spread": 0.001,
+      "last_trade_price": 0.999,
+      "outcomes": [
+        {
+          "name": "Up",
+          "token_id": "62704329578375872498125295882050384615111628429332315724168012026850118557818",
+          "price": 0.9995
+        },
+        {
+          "name": "Down",
+          "token_id": "11013980113011562887577844696445420098253226795458954137955025542882721904907",
+          "price": 0.0005
+        }
+      ]
+    },
+    {
+      "slug": "solana-up-or-down-january-27-7am-et",
+      "asset": "SOL",
+      "question": "Solana Up or Down - January 27, 7AM ET",
+      "condition_id": "0xd0ca80971e01ecb7b3d197cd3b6414be1aa792a58b76d708ab11e2ab325975ed",
+      "end_time": "2026-01-27T13:00:00+00:00",
+      "event_start_time": "2026-01-27T12:00:00+00:00",
+      "volume": 77622.263565,
+      "liquidity": 630175.39744,
+      "best_bid": null,
+      "best_ask": 0.001,
+      "spread": 0.001,
+      "last_trade_price": 0.001,
+      "outcomes": [
+        {
+          "name": "Up",
+          "token_id": "112263553789700196131069237237670095146182163389739594279779338786600267253664",
+          "price": 0.0005
+        },
+        {
+          "name": "Down",
+          "token_id": "61302443836547473998486549128490290323439176980010676661183107292801103595185",
+          "price": 0.9995
+        }
+      ]
+    },
+    {
+      "slug": "bitcoin-up-or-down-january-27-8am-et",
+      "asset": "BTC",
+      "question": "Bitcoin Up or Down - January 27, 8AM ET",
+      "condition_id": "0xd736ab1383f6c6ff5b845fd3dae2c7023af8ac35df938c32980655d047c44991",
+      "end_time": "2026-01-27T14:00:00+00:00",
+      "event_start_time": "2026-01-27T13:00:00+00:00",
+      "volume": 642681.959799,
+      "liquidity": 10168.2517,
+      "best_bid": 0.57,
+      "best_ask": 0.58,
+      "spread": 0.01,
+      "last_trade_price": 0.56,
+      "outcomes": [
+        {
+          "name": "Up",
+          "token_id": "77645880451075678079104128127881561457221462764889325530659973589207033604354",
+          "price": 0.575
+        },
+        {
+          "name": "Down",
+          "token_id": "75560235457189141176132919110290068127701246037653340817483716145978888398090",
+          "price": 0.425
+        }
+      ]
+    },
+    {
+      "slug": "ethereum-up-or-down-january-27-8am-et",
+      "asset": "ETH",
+      "question": "Ethereum Up or Down - January 27, 8AM ET",
+      "condition_id": "0x07bb8def444b948a231c717d3e146dadb9027dbfb036c96713ad1416cef9b312",
+      "end_time": "2026-01-27T14:00:00+00:00",
+      "event_start_time": "2026-01-27T13:00:00+00:00",
+      "volume": 162316.649804,
+      "liquidity": 10278.2829,
+      "best_bid": 0.21,
+      "best_ask": 0.22,
+      "spread": 0.01,
+      "last_trade_price": 0.2,
+      "outcomes": [
+        {
+          "name": "Up",
+          "token_id": "68147474696059669298896943214271987869286530406295581607631944591164967099768",
+          "price": 0.215
+        },
+        {
+          "name": "Down",
+          "token_id": "43845759026179350976707467287615135009973664593616324842855850602655449136988",
+          "price": 0.785
+        }
+      ]
+    },
+    {
+      "slug": "solana-up-or-down-january-27-8am-et",
+      "asset": "SOL",
+      "question": "Solana Up or Down - January 27, 8AM ET",
+      "condition_id": "0xcb7a95c3c539b98606f1073e22f1bef9e3f7f92364ce7e26a2a41c14063db2a2",
+      "end_time": "2026-01-27T14:00:00+00:00",
+      "event_start_time": "2026-01-27T13:00:00+00:00",
+      "volume": 24064.236442,
+      "liquidity": 4788.5733,
+      "best_bid": 0.13,
+      "best_ask": 0.15,
+      "spread": 0.02,
+      "last_trade_price": 0.12,
+      "outcomes": [
+        {
+          "name": "Up",
+          "token_id": "50673066007604993573490482989340838144927368546536807190782621604267980863247",
+          "price": 0.14
+        },
+        {
+          "name": "Down",
+          "token_id": "104780557035666726649349454133554777002636025384415521225580988235411597778565",
+          "price": 0.86
+        }
+      ]
+    },
+    {
+      "slug": "bitcoin-up-or-down-january-27-9am-et",
+      "asset": "BTC",
+      "question": "Bitcoin Up or Down - January 27, 9AM ET",
+      "condition_id": "0x8b083aa0d5483f92b5019becec2f845d17e0b5736f04a54ba4a7a9c72973c411",
+      "end_time": "2026-01-27T15:00:00+00:00",
+      "event_start_time": "2026-01-27T14:00:00+00:00",
+      "volume": 1135.632937,
+      "liquidity": 8820.0584,
+      "best_bid": 0.5,
+      "best_ask": 0.51,
+      "spread": 0.01,
+      "last_trade_price": 0.51,
+      "outcomes": [
+        {
+          "name": "Up",
+          "token_id": "39043725806394058383760789332602931264629520163762812448394961615012826692041",
+          "price": 0.505
+        },
+        {
+          "name": "Down",
+          "token_id": "62131612900696105844293543064731380190903623000610635444702959338162677758572",
+          "price": 0.495
+        }
+      ]
+    },
+    {
+      "slug": "ethereum-up-or-down-january-27-9am-et",
+      "asset": "ETH",
+      "question": "Ethereum Up or Down - January 27, 9AM ET",
+      "condition_id": "0xf54a67d6c9226091d239ab36a734c248c1f1fe89ad2d3949239122e75182ec67",
+      "end_time": "2026-01-27T15:00:00+00:00",
+      "event_start_time": "2026-01-27T14:00:00+00:00",
+      "volume": 102505.977251,
+      "liquidity": 8166.9114,
+      "best_bid": 0.49,
+      "best_ask": 0.5,
+      "spread": 0.01,
+      "last_trade_price": 0.5,
+      "outcomes": [
+        {
+          "name": "Up",
+          "token_id": "42155348995646169370764512865027127602198403567306425405804735829836119877330",
+          "price": 0.495
+        },
+        {
+          "name": "Down",
+          "token_id": "57730888969134848100441694673488266314463499317297042336322575858837966651520",
+          "price": 0.505
+        }
+      ]
+    },
+    {
+      "slug": "solana-up-or-down-january-27-9am-et",
+      "asset": "SOL",
+      "question": "Solana Up or Down - January 27, 9AM ET",
+      "condition_id": "0x3800786e305e56c959c9265cbacf9509f40c564dc8deec5beed2c432f0e951ff",
+      "end_time": "2026-01-27T15:00:00+00:00",
+      "event_start_time": "2026-01-27T14:00:00+00:00",
+      "volume": 10.0,
+      "liquidity": 3839.2492,
+      "best_bid": 0.51,
+      "best_ask": 0.52,
+      "spread": 0.01,
+      "last_trade_price": null,
+      "outcomes": [
+        {
+          "name": "Up",
+          "token_id": "78109285278525186924165238279891545033127073307440184365718398204977730430251",
+          "price": 0.515
+        },
+        {
+          "name": "Down",
+          "token_id": "64442036292077086894863304465640400820797798902885710713473595125482018732206",
+          "price": 0.485
+        }
+      ]
+    },
+    {
+      "slug": "bitcoin-up-or-down-january-27-10am-et",
+      "asset": "BTC",
+      "question": "Bitcoin Up or Down - January 27, 10AM ET",
+      "condition_id": "0x8fdc9dd892bb1f01435b68b7f89a62334a1f09399492065af0cb1fba272e1053",
+      "end_time": "2026-01-27T16:00:00+00:00",
+      "event_start_time": "2026-01-27T15:00:00+00:00",
+      "volume": 408304.918028,
+      "liquidity": 12503.9223,
+      "best_bid": 0.49,
+      "best_ask": 0.51,
+      "spread": 0.02,
+      "last_trade_price": 0.5,
+      "outcomes": [
+        {
+          "name": "Up",
+          "token_id": "77601784327440043371867135104374374706427473594351739299376092108535454068335",
+          "price": 0.5
+        },
+        {
+          "name": "Down",
+          "token_id": "67182361618914934946255589574411320304727809646679612219194348862309480305277",
+          "price": 0.5
+        }
+      ]
+    },
+    {
+      "slug": "ethereum-up-or-down-january-27-10am-et",
+      "asset": "ETH",
+      "question": "Ethereum Up or Down - January 27, 10AM ET",
+      "condition_id": "0xeebadd18069ab779f8e58a2c0762fedc3dbbd5d58c40989ef0223215059df2a0",
+      "end_time": "2026-01-27T16:00:00+00:00",
+      "event_start_time": "2026-01-27T15:00:00+00:00",
+      "volume": 159033.868034,
+      "liquidity": 12217.8895,
+      "best_bid": 0.49,
+      "best_ask": 0.51,
+      "spread": 0.02,
+      "last_trade_price": 0.5,
+      "outcomes": [
+        {
+          "name": "Up",
+          "token_id": "68693516263847322275963655270823271883328594170983000959905168864913970465211",
+          "price": 0.5
+        },
+        {
+          "name": "Down",
+          "token_id": "95984840832852793058076656401497748101936163024286244089420753742721254199674",
+          "price": 0.5
+        }
+      ]
+    },
+    {
+      "slug": "solana-up-or-down-january-27-10am-et",
+      "asset": "SOL",
+      "question": "Solana Up or Down - January 27, 10AM ET",
+      "condition_id": "0x524c4416069a8e917966bb8f0f2b087830f6294683d2ba268874232725d37797",
+      "end_time": "2026-01-27T16:00:00+00:00",
+      "event_start_time": "2026-01-27T15:00:00+00:00",
+      "volume": 31909.876664,
+      "liquidity": 11091.4638,
+      "best_bid": 0.49,
+      "best_ask": 0.51,
+      "spread": 0.02,
+      "last_trade_price": 0.51,
+      "outcomes": [
+        {
+          "name": "Up",
+          "token_id": "72196715406582786164055002645832643605536403057816383417389194116878902813051",
+          "price": 0.5
+        },
+        {
+          "name": "Down",
+          "token_id": "10919909045936422771920277845735663769390075631427686272814803080956081017628",
+          "price": 0.5
+        }
+      ]
+    },
+    {
+      "slug": "bitcoin-up-or-down-january-27-11am-et",
+      "asset": "BTC",
+      "question": "Bitcoin Up or Down - January 27, 11AM ET",
+      "condition_id": "0x64754643d18f4c9dd7e506d67bc89cf23263e41bee7bfe5a93e45e62cd03a271",
+      "end_time": "2026-01-27T17:00:00+00:00",
+      "event_start_time": "2026-01-27T16:00:00+00:00",
+      "volume": 341871.914895,
+      "liquidity": 12359.6436,
+      "best_bid": 0.49,
+      "best_ask": 0.51,
+      "spread": 0.02,
+      "last_trade_price": 0.5,
+      "outcomes": [
+        {
+          "name": "Up",
+          "token_id": "2474559416218530767406714964063779595540490091592139067755596843251938679271",
+          "price": 0.5
+        },
+        {
+          "name": "Down",
+          "token_id": "34754327416002511633614442627285864829854360484009724658126362696443313406892",
+          "price": 0.5
+        }
+      ]
+    },
+    {
+      "slug": "ethereum-up-or-down-january-27-11am-et",
+      "asset": "ETH",
+      "question": "Ethereum Up or Down - January 27, 11AM ET",
+      "condition_id": "0x59e16b180d877dbe5679aaafb147a955c40c2e387ac38c1d71a6ee4c3a635aed",
+      "end_time": "2026-01-27T17:00:00+00:00",
+      "event_start_time": "2026-01-27T16:00:00+00:00",
+      "volume": 51067.64274,
+      "liquidity": 12107.7031,
+      "best_bid": 0.49,
+      "best_ask": 0.5,
+      "spread": 0.01,
+      "last_trade_price": 0.5,
+      "outcomes": [
+        {
+          "name": "Up",
+          "token_id": "17557500691448697200774115787492097054676239243015119960552112019364051232705",
+          "price": 0.495
+        },
+        {
+          "name": "Down",
+          "token_id": "68238987423560378582345805884457289485299358456949529508638923129391586653278",
+          "price": 0.505
+        }
+      ]
+    },
+    {
+      "slug": "solana-up-or-down-january-27-11am-et",
+      "asset": "SOL",
+      "question": "Solana Up or Down - January 27, 11AM ET",
+      "condition_id": "0x3c3277648ac369d9675daf2cbdfe6ff2cc9100e958e07256ae49846c086fa6c2",
+      "end_time": "2026-01-27T17:00:00+00:00",
+      "event_start_time": "2026-01-27T16:00:00+00:00",
+      "volume": 10031.0,
+      "liquidity": 11158.9884,
+      "best_bid": 0.5,
+      "best_ask": 0.51,
+      "spread": 0.01,
+      "last_trade_price": 0.51,
+      "outcomes": [
+        {
+          "name": "Up",
+          "token_id": "36636766171220872481652133784175308632774223686045497958726619599452344803898",
+          "price": 0.505
+        },
+        {
+          "name": "Down",
+          "token_id": "31116413394673333735239113937055441515110720915603761187294703333388704556746",
+          "price": 0.495
+        }
+      ]
+    }
+  ]
+}

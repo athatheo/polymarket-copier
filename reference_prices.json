@@ -1,0 +1,42 @@
+{
+  "1265033": {
+    "reference_price": 87880.0,
+    "crypto": "BTC",
+    "title": "Bitcoin Up or Down - January 27, 7AM ET",
+    "end_time": "2026-01-27T13:00:00+00:00",
+    "recorded_at": "2026-01-27T12:55:19.467877+00:00",
+    "market_up_price_at_record": 0.61
+  },
+  "1270429": {
+    "reference_price": 87880.0,
+    "crypto": "BTC",
+    "title": "Bitcoin Up or Down - January 27, 4:00AM-8:00AM ET",
+    "end_time": "2026-01-27T13:00:00+00:00",
+    "recorded_at": "2026-01-27T12:55:19.467888+00:00",
+    "market_up_price_at_record": 0.045
+  },
+  "1265232": {
+    "reference_price": 87880.0,
+    "crypto": "BTC",
+    "title": "Bitcoin Up or Down - January 27, 8AM ET",
+    "end_time": "2026-01-27T14:00:00+00:00",
+    "recorded_at": "2026-01-27T12:55:19.467893+00:00",
+    "market_up_price_at_record": 0.505
+  },
+  "1271167": {
+    "reference_price": 87880.0,
+    "crypto": "BTC",
+    "title": "Bitcoin Up or Down - January 27, 8:45AM-9:00AM ET",
+    "end_time": "2026-01-27T14:00:00+00:00",
+    "recorded_at": "2026-01-27T12:55:19.467897+00:00",
+    "market_up_price_at_record": 0.495
+  },
+  "1271263": {
+    "reference_price": 87880.0,
+    "crypto": "BTC",
+    "title": "Bitcoin Up or Down - January 27, 9:15AM-9:30AM ET",
+    "end_time": "2026-01-27T14:30:00+00:00",
+    "recorded_at": "2026-01-27T12:55:19.467900+00:00",
+    "market_up_price_at_record": 0.505
+  }
+}
