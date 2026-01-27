@@ -45,8 +45,8 @@ MIN_PROFIT_NEAR_EXPIRY = 3           # Need at least 3% profit to lock in (was 5
 FORCE_EXIT_MINUTES = 5               # FORCE exit with ANY profit/loss within 5 min of expiry
 
 # Position sizing
-MAX_POSITION_USD = 50                # Max per trade
-MAX_TOTAL_EXPOSURE = 200             # Max across all positions
+MAX_POSITION_USD = 15                # Max per trade
+MAX_TOTAL_EXPOSURE = 87             # Max across all positions
 
 # Volatility estimates (hourly, in percentage)
 HOURLY_VOLATILITY = {
