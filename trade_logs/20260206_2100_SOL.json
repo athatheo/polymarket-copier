@@ -1,0 +1,36 @@
+{
+  "hour": "2026-02-06T21:00:00+00:00",
+  "asset": "SOL",
+  "trades": [
+    {
+      "time": "02:00:04",
+      "action": "BUY_UP",
+      "price": 0.51,
+      "size": 24.0,
+      "pnl": null
+    },
+    {
+      "time": "02:31:40",
+      "action": "SELL_UP",
+      "price": 0.77,
+      "size": 47.05882352941176,
+      "pnl": 12.235294117647058
+    },
+    {
+      "time": "02:50:50",
+      "action": "BUY_UP",
+      "price": 0.39,
+      "size": 10.0,
+      "pnl": null
+    },
+    {
+      "time": "02:57:12",
+      "action": "SELL_UP",
+      "price": 0.17,
+      "size": 25.64102564102564,
+      "pnl": -5.641025641025641
+    }
+  ],
+  "total_pnl": 6.594268476621417,
+  "num_trades": 4
+}

@@ -1,0 +1,78 @@
+{
+  "hour": "2026-02-10T06:00:00+00:00",
+  "asset": "BTC",
+  "trades": [
+    {
+      "time": "11:00:15",
+      "action": "BUY_UP",
+      "price": 0.5,
+      "size": 24.0,
+      "pnl": null
+    },
+    {
+      "time": "11:25:11",
+      "action": "SELL_UP",
+      "price": 0.64,
+      "size": 48.0,
+      "pnl": 6.719999999999999
+    },
+    {
+      "time": "11:33:57",
+      "action": "BUY_UP",
+      "price": 0.51,
+      "size": 16.0,
+      "pnl": null
+    },
+    {
+      "time": "11:37:40",
+      "action": "SELL_UP",
+      "price": 0.76,
+      "size": 31.372549019607842,
+      "pnl": 7.843137254901961
+    },
+    {
+      "time": "11:43:14",
+      "action": "BUY_DOWN",
+      "price": 0.22999999999999998,
+      "size": 16.0,
+      "pnl": null
+    },
+    {
+      "time": "11:46:09",
+      "action": "SELL_DOWN",
+      "price": 0.5900000000000001,
+      "size": 69.56521739130436,
+      "pnl": 25.043478260869577
+    },
+    {
+      "time": "11:46:41",
+      "action": "BUY_DOWN",
+      "price": 0.61,
+      "size": 10.0,
+      "pnl": null
+    },
+    {
+      "time": "11:48:00",
+      "action": "SELL_DOWN",
+      "price": 0.91,
+      "size": 16.39344262295082,
+      "pnl": 4.918032786885245
+    },
+    {
+      "time": "11:52:15",
+      "action": "BUY_UP",
+      "price": 0.05,
+      "size": 3.0,
+      "pnl": null
+    },
+    {
+      "time": "11:57:03",
+      "action": "SELL_UP",
+      "price": 0.16,
+      "size": 60.0,
+      "pnl": 6.6
+    }
+  ],
+  "total_pnl": 51.12464830265679,
+  "num_trades": 10
+}

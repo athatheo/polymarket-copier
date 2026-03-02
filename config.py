@@ -66,7 +66,19 @@ HOURLY_MAX_TOTAL_EXPOSURE: float = float(os.getenv("HOURLY_MAX_TOTAL_EXPOSURE", 
 
 # Trading thresholds
 HOURLY_PROFIT_TAKE_PCT: float = float(os.getenv("HOURLY_PROFIT_TAKE_PCT", "15"))
-HOURLY_HEDGE_TRIGGER_PCT: float = float(os.getenv("HOURLY_HEDGE_TRIGGER_PCT", "-10"))
+HOURLY_TREND_THRESHOLD: float = float(os.getenv("HOURLY_TREND_THRESHOLD", "0.25"))
+
+# Confidence-based sizing
+HOURLY_CONFIDENCE_LOW: float = float(os.getenv("HOURLY_CONFIDENCE_LOW", "0.3"))
+HOURLY_CONFIDENCE_HIGH: float = float(os.getenv("HOURLY_CONFIDENCE_HIGH", "0.6"))
+HOURLY_MAX_SIZE_MULTIPLIER: float = float(os.getenv("HOURLY_MAX_SIZE_MULTIPLIER", "3.0"))
+
+# Slippage protection
+HOURLY_MAX_SLIPPAGE_PCT: float = float(os.getenv("HOURLY_MAX_SLIPPAGE_PCT", "5.0"))
+
+# Directional cooldown (same-side re-entry protection)
+HOURLY_DIRECTIONAL_COOLDOWN_SEC: int = int(os.getenv("HOURLY_DIRECTIONAL_COOLDOWN_SEC", "120"))
+HOURLY_MAX_SAME_SIDE_RETRIES: int = int(os.getenv("HOURLY_MAX_SAME_SIDE_RETRIES", "2"))
 
 # Timing
 HOURLY_RE_ENTRY_COOLDOWN_SEC: int = int(os.getenv("HOURLY_RE_ENTRY_COOLDOWN_SEC", "30"))
@@ -75,6 +87,18 @@ HOURLY_POLL_INTERVAL_SEC: int = int(os.getenv("HOURLY_POLL_INTERVAL_SEC", "15"))
 # Entry filters
 HOURLY_MAX_SPREAD_TO_ENTER: float = float(os.getenv("HOURLY_MAX_SPREAD_TO_ENTER", "0.03"))
 HOURLY_MIN_MINUTES_TO_TRADE: int = int(os.getenv("HOURLY_MIN_MINUTES_TO_TRADE", "5"))
+HOURLY_WAIT_MINUTES: int = int(os.getenv("HOURLY_WAIT_MINUTES", "3"))
+HOURLY_STOP_LOSS_PCT: float = float(os.getenv("HOURLY_STOP_LOSS_PCT", "-40"))
+
+# =============================================================================
+# Proxy Configuration (optional - for bypassing Cloudflare blocks)
+# =============================================================================
+# Set PROXY_URL to route CLOB API requests through a proxy
+# Examples:
+#   SOCKS5: socks5://user:pass@proxy.example.com:1080
+#   HTTP:   http://user:pass@proxy.example.com:8080
+#   No auth: socks5://proxy.example.com:1080
+PROXY_URL: str = os.getenv("PROXY_URL", "")
 
 
 def validate_config() -> list[str]:

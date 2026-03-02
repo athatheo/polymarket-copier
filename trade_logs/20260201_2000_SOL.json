@@ -1,0 +1,15 @@
+{
+  "hour": "2026-02-01T20:00:00+00:00",
+  "asset": "SOL",
+  "trades": [
+    {
+      "time": "02:20:52",
+      "action": "BUY_DOWN",
+      "price": 0.41000000000000003,
+      "size": 20.0,
+      "pnl": null
+    }
+  ],
+  "total_pnl": 0.0,
+  "num_trades": 1
+}

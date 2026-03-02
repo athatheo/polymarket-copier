@@ -1,0 +1,36 @@
+{
+  "hour": "2026-02-11T00:00:00+00:00",
+  "asset": "ETH",
+  "trades": [
+    {
+      "time": "05:03:02",
+      "action": "BUY_UP",
+      "price": 0.52,
+      "size": 24.0,
+      "pnl": null
+    },
+    {
+      "time": "05:20:22",
+      "action": "SELL_UP",
+      "price": 0.65,
+      "size": 46.15384615384615,
+      "pnl": 6.0
+    },
+    {
+      "time": "05:38:50",
+      "action": "BUY_UP",
+      "price": 0.59,
+      "size": 16.0,
+      "pnl": null
+    },
+    {
+      "time": "05:49:28",
+      "action": "SELL_UP",
+      "price": 0.71,
+      "size": 27.118644067796613,
+      "pnl": 3.254237288135595
+    }
+  ],
+  "total_pnl": 9.254237288135595,
+  "num_trades": 4
+}

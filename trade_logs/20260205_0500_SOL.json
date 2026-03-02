@@ -1,0 +1,29 @@
+{
+  "hour": "2026-02-05T05:00:00+00:00",
+  "asset": "SOL",
+  "trades": [
+    {
+      "time": "10:00:09",
+      "action": "BUY_DOWN",
+      "price": 0.51,
+      "size": 24.0,
+      "pnl": null
+    },
+    {
+      "time": "10:08:46",
+      "action": "SELL_DOWN",
+      "price": 0.71,
+      "size": 47.05882352941176,
+      "pnl": 9.411764705882348
+    },
+    {
+      "time": "10:23:47",
+      "action": "BUY_DOWN",
+      "price": 0.52,
+      "size": 20.0,
+      "pnl": null
+    }
+  ],
+  "total_pnl": 9.411764705882348,
+  "num_trades": 3
+}

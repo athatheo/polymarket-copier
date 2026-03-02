@@ -87,6 +87,65 @@ async def main():
         await data_client.close()
     
     # =========================================================================
+    # CLOSED/RESOLVED POSITIONS
+    # =========================================================================
+    print("\n🏁 CLOSED/RESOLVED POSITIONS (Recent)")
+    print("-" * 70)
+    
+    try:
+        import httpx
+        response = httpx.get(
+            'https://data-api.polymarket.com/activity',
+            params={'user': address, 'limit': 100},
+            timeout=30
+        )
+        activity_data = response.json()
+        
+        # Get REDEEM activities (resolved positions)
+        redeems = [item for item in activity_data if item.get('type') == 'REDEEM']
+        
+        if redeems:
+            print(f"{'Market':<40} {'Redeemed':>12} {'Date':>16}")
+            print("-" * 70)
+            
+            total_redeemed = 0
+            for item in redeems[:15]:  # Show last 15
+                title = item.get('title', 'Unknown')[:37]
+                if len(item.get('title', '')) > 40:
+                    title += "..."
+                
+                # Size is the USDC value redeemed
+                size = float(item.get('usdcSize', 0) or item.get('size', 0))
+                total_redeemed += size
+                
+                # Format timestamp
+                ts = item.get('timestamp', 0)
+                if ts:
+                    from datetime import datetime as dt
+                    date_str = dt.fromtimestamp(ts).strftime('%m/%d %H:%M')
+                else:
+                    date_str = '-'
+                
+                # Show with indicator for won/lost
+                if size > 0:
+                    size_str = f"${size:>10.2f} ✓"
+                else:
+                    size_str = f"${size:>10.2f}  "
+                
+                print(f"{title:<40} {size_str} {date_str:>12}")
+            
+            print("-" * 70)
+            print(f"{'TOTAL REDEEMED':<40} ${total_redeemed:>10.2f}")
+            
+            if len(redeems) > 15:
+                print(f"  ... and {len(redeems) - 15} more")
+        else:
+            print("No closed positions yet")
+            
+    except Exception as e:
+        print(f"Error fetching closed positions: {e}")
+    
+    # =========================================================================
     # RECENT COPIED TRADES
     # =========================================================================
     print("\n📋 RECENT COPIED TRADES (Last 7 days)")

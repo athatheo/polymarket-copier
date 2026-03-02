@@ -1,0 +1,22 @@
+{
+  "hour": "2026-01-28T17:00:00+00:00",
+  "asset": "BTC",
+  "trades": [
+    {
+      "time": "22:00:05",
+      "action": "BUY_DOWN",
+      "price": 0.5,
+      "size": 20.0,
+      "pnl": null
+    },
+    {
+      "time": "22:18:58",
+      "action": "SELL_DOWN",
+      "price": 0.65,
+      "size": 40.0,
+      "pnl": 6.0
+    }
+  ],
+  "total_pnl": 6.0,
+  "num_trades": 2
+}

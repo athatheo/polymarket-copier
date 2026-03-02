@@ -42,6 +42,9 @@ class Position:
     current_value: float
     title: str
     outcome: str
+    cur_price: float = 0.0
+    redeemable: bool = False
+    end_date: str = ""
 
 
 @dataclass
@@ -220,6 +223,9 @@ class DataClient:
                     current_value=float(item.get("currentValue", 0)),
                     title=item.get("title", ""),
                     outcome=item.get("outcome", ""),
+                    cur_price=float(item.get("curPrice", 0)),
+                    redeemable=item.get("redeemable", False),
+                    end_date=item.get("endDate", ""),
                 )
                 positions.append(position)
             

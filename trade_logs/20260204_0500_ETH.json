@@ -1,0 +1,22 @@
+{
+  "hour": "2026-02-04T05:00:00+00:00",
+  "asset": "ETH",
+  "trades": [
+    {
+      "time": "10:00:19",
+      "action": "BUY_DOWN",
+      "price": 0.5,
+      "size": 24.0,
+      "pnl": null
+    },
+    {
+      "time": "10:30:28",
+      "action": "SELL_DOWN",
+      "price": 0.69,
+      "size": 48.0,
+      "pnl": 9.119999999999997
+    }
+  ],
+  "total_pnl": 9.119999999999997,
+  "num_trades": 2
+}
